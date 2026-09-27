@@ -1,0 +1,16 @@
+{% extends "analyses/base.html" %}
+{% block title %}Вход{% endblock %}
+{% block content %}
+<section class="card card--narrow">
+  <h1>Вход в MedTracker</h1>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% include "analyses/_form_fields.html" %}
+    <input type="hidden" name="next" value="{{ next }}">
+    <div class="actions">
+      <button type="submit" class="btn">Войти</button>
+    </div>
+  </form>
+  <p class="muted">Нет учётной записи? <a href="{% url 'signup' %}">Регистрация</a></p>
+</section>
+{% endblock %}

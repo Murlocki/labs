@@ -1,0 +1,53 @@
+{% extends "analyses/base.html" %}
+{% block title %}{{ analysis.name }}{% endblock %}
+{% block content %}
+<a class="back" href="{% url 'analysis_list' %}">← Мои анализы</a>
+
+<section class="card">
+  <h1>{{ analysis.name }}</h1>
+  <dl class="props">
+    <dt>Единица измерения</dt><dd>{{ analysis.unit|default:"—" }}</dd>
+    <dt>Описание</dt><dd>{{ analysis.description|default:"—"|linebreaksbr }}</dd>
+    <dt>Создан</dt><dd>{{ analysis.created_at|date:"d.m.Y" }}</dd>
+  </dl>
+  <div class="actions">
+    <a class="btn btn--ghost" href="{% url 'analysis_update' analysis.pk %}">Изменить анализ</a>
+    <a class="btn btn--danger" href="{% url 'analysis_delete' analysis.pk %}">Удалить анализ</a>
+    <a class="btn actions__right" href="{% url 'analysis_value_create' analysis.pk %}">+ Добавить значение</a>
+  </div>
+</section>
+
+<h2>Значения</h2>
+{% if entries %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Дата и время</th>
+          <th>Значение</th>
+          <th>Комментарий</th>
+          <th>Действия</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for entry in entries %}
+          <tr>
+            <td>{{ entry.measured_at|date:"d.m.Y H:i" }}</td>
+            <td><strong>{{ entry.value }}</strong>{% if analysis.unit %} {{ analysis.unit }}{% endif %}</td>
+            <td>{{ entry.note }}</td>
+            <td class="row-actions">
+              <a href="{% url 'value_update' entry.pk %}">Изменить</a>
+              <a class="danger" href="{% url 'value_delete' entry.pk %}">Удалить</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <div class="empty">
+    <p>Значений пока нет.</p>
+    <a href="{% url 'analysis_value_create' analysis.pk %}">Добавить значение</a>
+  </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "analyses/base.html" %}
+{% block title %}{% if object %}Изменение значения{% else %}Новое значение{% endif %}{% endblock %}
+{% block content %}
+<section class="card card--form">
+  <h1>{% if object %}Изменение значения{% else %}Новое значение{% endif %}</h1>
+  {% if not object and not form.fields.analysis.queryset.exists %}
+    <div class="empty">
+      <p>Сначала создайте анализ, к которому будет относиться значение.</p>
+      <a href="{% url 'analysis_create' %}">Добавить анализ</a>
+    </div>
+  {% else %}
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% include "analyses/_form_fields.html" %}
+      <div class="actions">
+        <button type="submit" class="btn">Сохранить</button>
+        <a href="{% if analysis %}{% url 'analysis_detail' analysis.pk %}{% else %}{% url 'analysis_list' %}{% endif %}">Отмена</a>
+      </div>
+    </form>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "analyses/base.html" %}
+{% block title %}Мои анализы{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Мои анализы</h1>
+  <a class="btn" href="{% url 'analysis_create' %}">+ Добавить анализ</a>
+</div>
+
+<form class="search" method="get">
+  <input type="search" name="q" value="{{ query }}" placeholder="Поиск по названию">
+  <button type="submit" class="btn btn--ghost">Найти</button>
+</form>
+
+{% if analyses %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Название</th>
+          <th>Ед. изм.</th>
+          <th class="num">Значений</th>
+          <th>Действия</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for analysis in analyses %}
+          <tr>
+            <td><a href="{% url 'analysis_detail' analysis.pk %}">{{ analysis.name }}</a></td>
+            <td>{{ analysis.unit|default:"—" }}</td>
+            <td class="num">{{ analysis.values_count }}</td>
+            <td class="row-actions">
+              <a href="{% url 'analysis_update' analysis.pk %}">Изменить</a>
+              <a class="danger" href="{% url 'analysis_delete' analysis.pk %}">Удалить</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% elif query %}
+  <div class="empty">
+    <p>Ничего не найдено.</p>
+    <a href="{% url 'analysis_list' %}">Сбросить поиск</a>
+  </div>
+{% else %}
+  <div class="empty">
+    <p>У вас пока нет анализов.</p>
+    <a href="{% url 'analysis_create' %}">Добавить анализ</a>
+  </div>
+{% endif %}
+{% endblock %}

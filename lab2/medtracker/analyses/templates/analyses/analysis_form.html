@@ -1,0 +1,15 @@
+{% extends "analyses/base.html" %}
+{% block title %}{% if object %}Изменение анализа{% else %}Новый анализ{% endif %}{% endblock %}
+{% block content %}
+<section class="card card--form">
+  <h1>{% if object %}Изменение анализа{% else %}Новый анализ{% endif %}</h1>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% include "analyses/_form_fields.html" %}
+    <div class="actions">
+      <button type="submit" class="btn">Сохранить</button>
+      <a href="{% if object %}{% url 'analysis_detail' object.pk %}{% else %}{% url 'analysis_list' %}{% endif %}">Отмена</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

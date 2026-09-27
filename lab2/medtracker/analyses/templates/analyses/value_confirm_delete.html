@@ -1,0 +1,20 @@
+{% extends "analyses/base.html" %}
+{% block title %}Удаление значения{% endblock %}
+{% block content %}
+<section class="card card--form">
+  <h1>Удалить значение?</h1>
+  <p>
+    Анализ «{{ entry.analysis.name }}»:
+    <strong>{{ entry.value }}{% if entry.analysis.unit %} {{ entry.analysis.unit }}{% endif %}</strong>
+    от {{ entry.measured_at|date:"d.m.Y H:i" }}
+  </p>
+  <p class="warning">Действие необратимо.</p>
+  <form method="post">
+    {% csrf_token %}
+    <div class="actions">
+      <button type="submit" class="btn btn--danger">Удалить</button>
+      <a href="{% url 'analysis_detail' entry.analysis_id %}">Отмена</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

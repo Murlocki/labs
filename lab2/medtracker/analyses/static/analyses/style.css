@@ -1,0 +1,111 @@
+:root {
+  --bg: #f4f6f9;
+  --surface: #ffffff;
+  --text: #1f2933;
+  --muted: #6b7280;
+  --border: #dde2ea;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --danger: #dc2626;
+  --success-bg: #e8f7ee;
+  --success-text: #166534;
+  --error-bg: #fdecec;
+  --radius: 8px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+a { color: var(--primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+h1 { font-size: 1.5rem; margin: 0 0 16px; }
+h2 { font-size: 1.2rem; margin: 28px 0 12px; }
+
+.container { max-width: 1000px; margin: 0 auto; padding: 0 16px; }
+main.container { padding-top: 24px; padding-bottom: 48px; }
+
+/* шапка */
+.topbar { background: var(--surface); border-bottom: 1px solid var(--border); }
+.topbar__inner { display: flex; align-items: center; gap: 24px; min-height: 56px; flex-wrap: wrap; }
+.brand { font-weight: 700; font-size: 1.15rem; color: var(--text); }
+.nav { display: flex; gap: 16px; flex: 1; flex-wrap: wrap; }
+.account { display: flex; align-items: center; gap: 12px; }
+.account form { margin: 0; }
+.account__name { color: var(--muted); }
+
+/* сообщения */
+.messages { list-style: none; padding: 0; margin: 0 0 16px; }
+.message { padding: 10px 14px; border-radius: var(--radius); margin-bottom: 8px; }
+.message--success { background: var(--success-bg); color: var(--success-text); }
+.message--error { background: var(--error-bg); color: var(--danger); }
+
+/* карточки */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; }
+.card--narrow { max-width: 420px; margin: 40px auto; }
+.card--form { max-width: 600px; }
+
+.page-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+.page-head h1 { margin: 0; }
+.back { display: inline-block; margin-bottom: 12px; }
+
+.props { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; margin: 0 0 20px; }
+.props dt { color: var(--muted); }
+.props dd { margin: 0; }
+
+/* кнопки */
+.btn {
+  display: inline-block; padding: 8px 16px; border: 1px solid var(--primary); border-radius: var(--radius);
+  background: var(--primary); color: #fff; font: inherit; cursor: pointer; text-decoration: none;
+}
+.btn:hover { background: var(--primary-hover); text-decoration: none; }
+.btn--ghost { background: transparent; color: var(--primary); }
+.btn--ghost:hover { background: #eef3ff; }
+.btn--danger { background: var(--danger); border-color: var(--danger); color: #fff; }
+.btn--danger:hover { background: #b91c1c; }
+.btn--small { padding: 4px 10px; font-size: 0.9rem; }
+
+.actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+.actions__right { margin-left: auto; }
+
+/* поиск */
+.search { display: flex; gap: 8px; margin-bottom: 16px; }
+.search input { flex: 1; max-width: 360px; }
+
+/* таблицы */
+.table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+.table { width: 100%; border-collapse: collapse; }
+.table th, .table td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+.table th { background: #f9fafb; font-weight: 600; color: var(--muted); font-size: 0.9rem; }
+.table tr:last-child td { border-bottom: none; }
+.table .num { text-align: right; }
+.row-actions { white-space: nowrap; }
+.row-actions a + a { margin-left: 12px; }
+a.danger { color: var(--danger); }
+
+.empty { background: var(--surface); border: 1px dashed var(--border); border-radius: var(--radius); padding: 24px; text-align: center; color: var(--muted); }
+.empty p { margin: 0 0 8px; }
+
+/* формы */
+.field { margin-bottom: 16px; }
+.field label { display: block; font-weight: 600; margin-bottom: 4px; }
+.req { color: var(--danger); }
+input[type="text"], input[type="password"], input[type="search"], input[type="datetime-local"], select, textarea {
+  width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius);
+  font: inherit; background: #fff; color: var(--text);
+}
+input:focus, select:focus, textarea:focus { outline: 2px solid #bfd3fe; border-color: var(--primary); }
+.field--error input, .field--error select, .field--error textarea { border-color: var(--danger); }
+.error { color: var(--danger); margin: 4px 0 0; font-size: 0.9rem; }
+.help { display: block; color: var(--muted); font-size: 0.85rem; margin-top: 4px; }
+.help ul { margin: 4px 0 0; padding-left: 18px; }
+.form-errors { background: var(--error-bg); color: var(--danger); padding: 10px 14px; border-radius: var(--radius); margin-bottom: 16px; }
+.form-errors p { margin: 0; }
+.warning { color: var(--danger); font-weight: 600; }
+.muted { color: var(--muted); }
