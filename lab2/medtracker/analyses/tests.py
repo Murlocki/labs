@@ -261,3 +261,21 @@ class DeleteTextTests(BaseTestCase):
         )
         response = self.client.get(reverse("value_delete", args=[entry.pk]))
         self.assertContains(response, "Удалить значение 5.4 ммоль/л от 27.09.2026 10:30?")
+
+
+class ErrorPagesTests(TestCase):
+    def test_404_page_in_russian(self):
+        response = self.client.get("/nonexistent/", HTTP_ACCEPT_LANGUAGE="en-US")
+        self.assertContains(response, "Страница не найдена", status_code=404)
+
+    def test_csrf_failure_page_in_russian(self):
+        client = self.client_class(enforce_csrf_checks=True)
+        response = client.post(reverse("login"), {"username": "a", "password": "b"})
+        self.assertContains(response, "Форма устарела", status_code=403)
+
+    def test_logout_get_not_allowed(self):
+        self.assertEqual(self.client.get(reverse("logout")).status_code, 405)
+
+    def test_interface_language_does_not_depend_on_browser(self):
+        response = self.client.get(reverse("login"), HTTP_ACCEPT_LANGUAGE="en-US")
+        self.assertContains(response, "Имя пользователя")
