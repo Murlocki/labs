@@ -89,6 +89,8 @@ main.container { padding-top: 24px; padding-bottom: 48px; }
 .row-actions a + a { margin-left: 12px; }
 a.danger { color: var(--danger); }
 
+.pager { display: flex; justify-content: center; align-items: center; gap: 16px; flex-wrap: wrap; margin-top: 12px; }
+
 .empty { background: var(--surface); border: 1px dashed var(--border); border-radius: var(--radius); padding: 24px; text-align: center; color: var(--muted); }
 .empty p { margin: 0 0 8px; }
 

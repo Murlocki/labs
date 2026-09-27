@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
+from django.core.paginator import Paginator
 from django.db.models import Count
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
@@ -71,10 +72,14 @@ class AnalysisListView(OwnAnalysisMixin, ListView):
 class AnalysisDetailView(OwnAnalysisMixin, DetailView):
     template_name = "analyses/analysis_detail.html"
     context_object_name = "analysis"
+    values_per_page = 50
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["entries"] = self.object.entries.order_by("-measured_at")
+        paginator = Paginator(self.object.entries.order_by("-measured_at"), self.values_per_page)
+        page = paginator.get_page(self.request.GET.get("page"))
+        context["page_obj"] = page
+        context["entries"] = page.object_list
         return context
 
 

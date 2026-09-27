@@ -1,9 +1,10 @@
 from datetime import timedelta
-from unittest import skipUnless
+from unittest import mock, skipUnless
 
 from django.contrib.auth.models import User
-from django.db import connection
+from django.db import OperationalError, connection
 from django.test import TestCase
+from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 from django.utils import timezone
 
@@ -208,3 +209,55 @@ class ValueTests(BaseTestCase):
         foreign = AnalysisValue.objects.create(analysis=self.make_analysis(user=self.other), value="1")
         for name in ("value_update", "value_delete"):
             self.assertEqual(self.client.get(reverse(name, args=[foreign.pk])).status_code, 404, name)
+
+
+class PaginationTests(BaseTestCase):
+    def test_values_paginated_by_50(self):
+        analysis = self.make_analysis()
+        now = timezone.now()
+        AnalysisValue.objects.bulk_create(
+            AnalysisValue(analysis=analysis, value=str(i), measured_at=now - timedelta(minutes=i)) for i in range(120)
+        )
+        url = reverse("analysis_detail", args=[analysis.pk])
+        response = self.client.get(url)
+        self.assertEqual(len(response.context["entries"]), 50)
+        self.assertEqual(response.context["entries"][0].value, "0")
+        self.assertContains(response, "Страница 1 из 3")
+        response = self.client.get(url, {"page": 3})
+        self.assertEqual([e.value for e in response.context["entries"]][-1], "119")
+        self.assertEqual(len(response.context["entries"]), 20)
+
+    def test_detail_query_count(self):
+        analysis = self.make_analysis()
+        AnalysisValue.objects.create(analysis=analysis, value="1")
+        url = reverse("analysis_detail", args=[analysis.pk])
+        with CaptureQueriesContext(connection) as ctx:
+            self.client.get(url)
+        domain = [q for q in ctx.captured_queries if "analyses_" in q["sql"]]
+        self.assertLessEqual(len(domain), 3)  # анализ, количество значений, страница значений
+
+    def test_list_single_query(self):
+        self.make_analysis()
+        with CaptureQueriesContext(connection) as ctx:
+            self.client.get(reverse("analysis_list"))
+        self.assertEqual(len([q for q in ctx.captured_queries if "analyses_" in q["sql"]]), 1)
+
+
+class DatabaseUnavailableTests(BaseTestCase):
+    def test_db_error_shows_friendly_page(self):
+        with (
+            mock.patch("analyses.views.AnalysisListView.get_queryset", side_effect=OperationalError("no connection")),
+            self.assertLogs("analyses.middleware", level="ERROR"),
+        ):
+            response = self.client.get(reverse("analysis_list"))
+        self.assertEqual(response.status_code, 503)
+        self.assertContains(response, "Сервер базы данных недоступен", status_code=503)
+
+
+class DeleteTextTests(BaseTestCase):
+    def test_value_delete_confirmation_text(self):
+        entry = AnalysisValue.objects.create(
+            analysis=self.make_analysis(), value="5.4", measured_at=timezone.make_aware(timezone.datetime(2026, 9, 27, 10, 30))
+        )
+        response = self.client.get(reverse("value_delete", args=[entry.pk]))
+        self.assertContains(response, "Удалить значение 5.4 ммоль/л от 27.09.2026 10:30?")

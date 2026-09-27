@@ -21,7 +21,7 @@
 | `/accounts/logout/` | `logout` | POST | выход | FR-3 |
 | `/analyses/` | `analysis_list` | GET | список анализов (+ поиск `?q=`) | FR-6, FR-7 |
 | `/analyses/add/` | `analysis_create` | GET, POST | создание анализа | FR-8 |
-| `/analyses/<id>/` | `analysis_detail` | GET | анализ и таблица его значений | FR-9, FR-12 |
+| `/analyses/<id>/` | `analysis_detail` | GET | анализ и таблица его значений (+ страница `?page=`) | FR-9, FR-12 |
 | `/analyses/<id>/edit/` | `analysis_update` | GET, POST | изменение анализа | FR-10 |
 | `/analyses/<id>/delete/` | `analysis_delete` | GET, POST | подтверждение и удаление анализа | FR-11 |
 | `/values/add/` | `value_create` | GET, POST | добавление значения (анализ выбирается) | FR-13 |
@@ -101,6 +101,8 @@
 │ 20.09.2026 09:10 │ 5.9 ммоль/л  │                 │ Изменить Удалить │
 │ 01.09.2026 08:00 │ 5.1 ммоль/л  │ Инвитро         │ Изменить Удалить │
 └──────────────────┴──────────────┴─────────────────┴──────────────────┘
+        ← Новее   Страница 1 из 3 · всего значений: 120   Старее →
+                  (навигация выводится, если значений больше 50)
 ```
 
 ### Форма анализа — `/analyses/add/`, `/analyses/<id>/edit/`
@@ -184,6 +186,7 @@ medtracker/
     ├── models.py           # Unit, Analysis, AnalysisValue
     ├── forms.py            # AnalysisForm, AnalysisValueForm, SignUpForm
     ├── views.py            # CRUD анализов и значений, регистрация
+    ├── middleware.py       # страница «Сервер базы данных недоступен» (HTTP 503)
     ├── urls.py
     ├── admin.py            # UnitAdmin, AnalysisAdmin, AnalysisValueAdmin
     ├── apps.py
@@ -201,7 +204,8 @@ medtracker/
     │       ├── analysis_form.html
     │       ├── analysis_confirm_delete.html
     │       ├── value_form.html
-    │       └── value_confirm_delete.html
+    │       ├── value_confirm_delete.html
+    │       └── db_unavailable.html
     └── static/analyses/
         └── style.css
 ```
@@ -234,3 +238,5 @@ medtracker/
 | 13 | Войти в `/admin/` суперпользователем, добавить единицу, заблокировать пользователя | единица доступна в формах, заблокированный пользователь не может войти | FR-19 – FR-21 |
 | 14 | Войти в `/admin/` обычным пользователем | доступ запрещён | FR-19 |
 | 15 | Проверить репозиторий | нет `.env`, виртуального окружения, паролей | 3.3 |
+| 16 | Открыть анализ со 120 значениями | выведено 50 значений и навигация «Страница 1 из 3»; страница формируется быстрее 1 с | FR-12, 3.5 |
+| 17 | Остановить PostgreSQL или разорвать сеть и открыть любую страницу | страница «Сервер базы данных недоступен», код 503; после восстановления связи работа продолжается | 3.2 |

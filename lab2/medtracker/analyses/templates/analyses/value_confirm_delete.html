@@ -2,12 +2,8 @@
 {% block title %}Удаление значения{% endblock %}
 {% block content %}
 <section class="card card--form">
-  <h1>Удалить значение?</h1>
-  <p>
-    Анализ «{{ entry.analysis.name }}»:
-    <strong>{{ entry.value }}{% if entry.analysis.unit %} {{ entry.analysis.unit }}{% endif %}</strong>
-    от {{ entry.measured_at|date:"d.m.Y H:i" }}
-  </p>
+  <h1>Удалить значение {{ entry.value }}{% if entry.analysis.unit %} {{ entry.analysis.unit }}{% endif %} от {{ entry.measured_at|date:"d.m.Y H:i" }}?</h1>
+  <p>Анализ: «{{ entry.analysis.name }}».</p>
   <p class="warning">Действие необратимо.</p>
   <form method="post">
     {% csrf_token %}

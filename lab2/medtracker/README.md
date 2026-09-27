@@ -31,7 +31,6 @@ sudo -u postgres psql
 ```sql
 CREATE USER userdb WITH PASSWORD 'пароль';
 CREATE DATABASE study OWNER userdb ENCODING 'UTF8';
-ALTER USER userdb CREATEDB;   -- только для запуска тестов (создают временную БД test_study)
 \q
 ```
 
@@ -43,11 +42,9 @@ listen_addresses = '*'
 
 # pg_hba.conf — подсеть, из которой подключается Windows
 host    study            userdb            192.168.1.0/24    scram-sha-256
-host    test_study       userdb            192.168.1.0/24    scram-sha-256
-host    postgres         userdb            192.168.1.0/24    scram-sha-256
 ```
 
-Две последние строки нужны только для тестов.
+Пользователь `userdb` имеет права только на БД `study` (не суперпользователь, без `CREATEDB`).
 
 ```bash
 sudo systemctl restart postgresql
@@ -111,10 +108,30 @@ SELECT * FROM analyses_analysisvalue ORDER BY measured_at DESC;
 
 ## 5. Тесты
 
-На PostgreSQL (нужно право `CREATEDB`, см. п. 1):
+Тесты создают временную БД `test_study`, поэтому на время прогона на PostgreSQL пользователю нужно право `CREATEDB`
+и доступ к БД `test_study` и `postgres`. После прогона права отзываются.
+
+На Debian — выдать права:
+
+```bash
+sudo -u postgres psql -c "ALTER ROLE userdb CREATEDB"
+echo "host test_study userdb 192.168.1.0/24 scram-sha-256" | sudo tee -a /etc/postgresql/17/main/pg_hba.conf
+echo "host postgres   userdb 192.168.1.0/24 scram-sha-256" | sudo tee -a /etc/postgresql/17/main/pg_hba.conf
+sudo systemctl reload postgresql
+```
+
+На Windows — запустить тесты:
 
 ```powershell
 python manage.py test analyses
+```
+
+На Debian — отозвать права:
+
+```bash
+sudo -u postgres psql -c "ALTER ROLE userdb NOCREATEDB"
+sudo sed -i '/^host test_study userdb/d; /^host postgres   userdb/d' /etc/postgresql/17/main/pg_hba.conf
+sudo systemctl reload postgresql
 ```
 
 Без сервера БД, на SQLite (2 теста регистронезависимости для кириллицы пропускаются):
@@ -135,6 +152,7 @@ medtracker/
     ├── models.py        # Unit, Analysis, AnalysisValue
     ├── forms.py
     ├── views.py
+    ├── middleware.py    # страница «Сервер базы данных недоступен»
     ├── urls.py
     ├── admin.py
     ├── tests.py

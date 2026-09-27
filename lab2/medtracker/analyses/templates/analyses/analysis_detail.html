@@ -44,6 +44,13 @@
       </tbody>
     </table>
   </div>
+  {% if page_obj.has_other_pages %}
+    <nav class="pager">
+      {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}">← Новее</a>{% endif %}
+      <span class="muted">Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }} · всего значений: {{ page_obj.paginator.count }}</span>
+      {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}">Старее →</a>{% endif %}
+    </nav>
+  {% endif %}
 {% else %}
   <div class="empty">
     <p>Значений пока нет.</p>
