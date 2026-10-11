@@ -1,0 +1,29 @@
+sequenceDiagram
+    autonumber
+    actor P as Пользователь
+    participant B as Браузер
+    participant V as View (Django)
+    participant F as Form
+    participant O as ORM
+    participant DB as PostgreSQL
+
+    P->>B: «+ Добавить значение»
+    B->>V: GET /analyses/3/values/add/
+    V->>O: анализ id=3 текущего пользователя
+    O->>DB: SELECT
+    DB-->>O: анализ
+    V-->>B: HTML-форма
+    P->>B: заполняет поля, «Сохранить»
+    B->>V: POST + CSRF-токен
+    V->>F: проверка полей
+    alt данные корректны
+        F-->>V: ok
+        V->>O: сохранить значение
+        O->>DB: INSERT (в транзакции)
+        V-->>B: 302 → /analyses/3/
+        B->>V: GET /analyses/3/
+        V-->>B: страница анализа, «Значение добавлено.»
+    else ошибки проверки
+        F-->>V: ошибки полей
+        V-->>B: форма с ошибками, данные не сохранены
+    end

@@ -1,0 +1,38 @@
+erDiagram
+    auth_user ||--o{ analyses_analysis : "владеет"
+    analyses_unit |o--o{ analyses_analysis : "единица измерения"
+    analyses_analysis ||--o{ analyses_analysisvalue : "содержит значения"
+
+    auth_user {
+        integer id PK
+        varchar(150) username UK "имя пользователя"
+        varchar(128) password "хеш пароля"
+        boolean is_active "активен"
+        boolean is_staff "персонал"
+        boolean is_superuser "суперпользователь"
+        timestamptz last_login "последний вход"
+        timestamptz date_joined "дата регистрации"
+    }
+    analyses_unit {
+        bigint id PK
+        varchar(32) name UK "обозначение"
+        varchar(64) note "категория"
+    }
+    analyses_analysis {
+        bigint id PK
+        integer user_id FK "владелец, CASCADE"
+        varchar(128) name "название, уникально у владельца"
+        bigint unit_id FK "единица, SET NULL"
+        text description "описание"
+        timestamptz created_at "создан"
+        timestamptz updated_at "изменён"
+    }
+    analyses_analysisvalue {
+        bigint id PK
+        bigint analysis_id FK "анализ, CASCADE"
+        varchar(64) value "значение"
+        timestamptz measured_at "дата и время сдачи"
+        varchar(255) note "комментарий"
+        timestamptz created_at "внесено"
+        timestamptz updated_at "изменено"
+    }

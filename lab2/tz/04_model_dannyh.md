@@ -11,37 +11,57 @@
 
 ## 4.2. ER-схема
 
-```text
-                          ┌──────────────────┐
-                          │ User (auth_user) │
-                          │──────────────────│
-                          │ id               │
-                          │ username         │
-                          │ password         │
-                          │ is_active ...    │
-                          └────────┬─────────┘
-                                   │ 1
-                                   │
-                                   │ *
-┌──────────────┐ 0..1   * ┌────────┴─────────┐ 1      * ┌──────────────────────┐
-│ Unit         │──────────│ Analysis         │──────────│ AnalysisValue        │
-│──────────────│          │──────────────────│          │──────────────────────│
-│ id      PK   │          │ id          PK   │          │ id           PK      │
-│ name    UQ   │          │ user_id     FK   │          │ analysis_id  FK      │
-│ note         │          │ name             │          │ value                │
-└──────────────┘          │ unit_id     FK   │          │ measured_at          │
-                          │ description      │          │ note                 │
-                          │ created_at       │          │ created_at           │
-                          │ updated_at       │          │ updated_at           │
-                          └──────────────────┘          └──────────────────────┘
+```mermaid
+erDiagram
+    auth_user ||--o{ analyses_analysis : "владеет"
+    analyses_unit |o--o{ analyses_analysis : "единица измерения"
+    analyses_analysis ||--o{ analyses_analysisvalue : "содержит значения"
+
+    auth_user {
+        integer id PK
+        varchar(150) username UK "имя пользователя"
+        varchar(128) password "хеш пароля"
+        boolean is_active "активен"
+        boolean is_staff "персонал"
+        boolean is_superuser "суперпользователь"
+        timestamptz last_login "последний вход"
+        timestamptz date_joined "дата регистрации"
+    }
+    analyses_unit {
+        bigint id PK
+        varchar(32) name UK "обозначение"
+        varchar(64) note "категория"
+    }
+    analyses_analysis {
+        bigint id PK
+        integer user_id FK "владелец, CASCADE"
+        varchar(128) name "название, уникально у владельца"
+        bigint unit_id FK "единица, SET NULL"
+        text description "описание"
+        timestamptz created_at "создан"
+        timestamptz updated_at "изменён"
+    }
+    analyses_analysisvalue {
+        bigint id PK
+        bigint analysis_id FK "анализ, CASCADE"
+        varchar(64) value "значение"
+        timestamptz measured_at "дата и время сдачи"
+        varchar(255) note "комментарий"
+        timestamptz created_at "внесено"
+        timestamptz updated_at "изменено"
+    }
 ```
+
+Изображение схемы: [`diagrams/02_er.png`](../diagrams/02_er.png).
 
 Связи:
 
-- `User 1 — * Analysis`: у пользователя может быть много анализов; анализ принадлежит одному пользователю.
-- `Unit 0..1 — * Analysis`: у анализа может быть не указана единица; одна единица используется многими анализами.
-- `Analysis 1 — * AnalysisValue`: у анализа много значений; значение относится к одному анализу.
-  Владелец значения определяется через анализ (`value.analysis.user`).
+- `auth_user 1 — * analyses_analysis`: у пользователя может быть много анализов; анализ принадлежит одному
+  пользователю. При удалении пользователя его анализы удаляются (`CASCADE`).
+- `analyses_unit 0..1 — * analyses_analysis`: у анализа может быть не указана единица; одна единица используется
+  многими анализами. При удалении единицы ссылка обнуляется (`SET NULL`).
+- `analyses_analysis 1 — * analyses_analysisvalue`: у анализа много значений; значение относится к одному анализу.
+  При удалении анализа его значения удаляются (`CASCADE`). Владелец значения определяется через анализ.
 
 ## 4.3. Unit — единица измерения
 

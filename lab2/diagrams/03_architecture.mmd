@@ -1,0 +1,22 @@
+flowchart TB
+    B[Браузер пользователя]
+    subgraph D[Web-приложение Django: проект medtracker, приложение analyses]
+        direction TB
+        MW[Middleware: сессии, CSRF, аутентификация, сообщения]
+        URL[urls.py: маршрутизация]
+        V[views.py: представления]
+        F[forms.py: проверка данных]
+        T[templates: HTML-шаблоны]
+        M[models.py: ORM]
+        ADM[admin.py: административный интерфейс]
+        MW --> URL --> V
+        V --> F
+        V --> T
+        V --> M
+        ADM --> M
+    end
+    DB[(PostgreSQL: БД study)]
+
+    B -->|HTTP-запрос| MW
+    T -->|HTML-страница| B
+    M -->|SQL, psycopg2| DB
