@@ -1,3 +1,8 @@
 # Временные файлы Office
 ~$*
 ~WRL*.tmp
+
+# Рабочие материалы (не часть сдаваемой работы)
+_notes/
+LAB2_context.md
+DevOps.pdf
