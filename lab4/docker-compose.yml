@@ -1,0 +1,19 @@
+services:
+  medtracker:
+    image: murlocki/medtracker:1.0
+    container_name: medtracker_app
+    ports:
+      - "8000:8000"
+    environment:
+      DEBUG: "True"
+      ALLOWED_HOSTS: "192.168.1.7,localhost,127.0.0.1"
+      DB_NAME: study
+      DB_USER: userdb
+      DB_HOST: host.docker.internal   # PostgreSQL на хост-машине (ВМ Debian)
+      DB_PORT: "5432"
+      # секреты подставляются из файла .env рядом с этим файлом (см. .env.example)
+      DB_PASSWORD: ${DB_PASSWORD}
+      SECRET_KEY: ${SECRET_KEY}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped

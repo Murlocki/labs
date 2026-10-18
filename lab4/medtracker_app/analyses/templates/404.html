@@ -1,0 +1,11 @@
+{% extends "analyses/base.html" %}
+{% block title %}Страница не найдена{% endblock %}
+{% block content %}
+<section class="card card--narrow">
+  <h1>Страница не найдена</h1>
+  <p>Запрошенная страница не существует или у вас нет к ней доступа.</p>
+  <div class="actions">
+    <a class="btn" href="{% url 'analysis_list' %}">Мои анализы</a>
+  </div>
+</section>
+{% endblock %}

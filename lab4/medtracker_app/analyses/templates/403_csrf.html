@@ -1,0 +1,26 @@
+{% load static %}<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Форма устарела — MedTracker</title>
+  <link rel="stylesheet" href="{% static 'analyses/style.css' %}">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar__inner">
+      <a class="brand" href="{% url 'analysis_list' %}">MedTracker</a>
+    </div>
+  </header>
+  <main class="container">
+    <section class="card card--narrow">
+      <h1>Форма устарела</h1>
+      <p>Не удалось проверить подлинность отправленной формы. Данные не сохранены.</p>
+      <p class="muted">Вернитесь назад, обновите страницу и отправьте форму ещё раз.</p>
+      <div class="actions">
+        <a class="btn" href="{% url 'analysis_list' %}">Мои анализы</a>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

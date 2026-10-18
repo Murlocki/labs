@@ -1,0 +1,47 @@
+{% load static %}<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}MedTracker{% endblock %} — MedTracker</title>
+  <link rel="stylesheet" href="{% static 'analyses/style.css' %}">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar__inner">
+      <a class="brand" href="{% url 'analysis_list' %}">MedTracker</a>
+      <nav class="nav">
+        {% if user.is_authenticated %}
+          <a href="{% url 'analysis_list' %}">Мои анализы</a>
+          <a href="{% url 'value_create' %}">+ Добавить значение</a>
+          {% if user.is_staff %}<a href="{% url 'admin:index' %}">Администрирование</a>{% endif %}
+        {% endif %}
+      </nav>
+      <div class="account">
+        {% if user.is_authenticated %}
+          <span class="account__name">{{ user.username }}</span>
+          <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn--small btn--ghost">Выйти</button>
+          </form>
+        {% else %}
+          <a href="{% url 'login' %}">Вход</a>
+          <a href="{% url 'signup' %}">Регистрация</a>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+          <li class="message message--{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>
