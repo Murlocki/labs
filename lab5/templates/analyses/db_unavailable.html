@@ -1,0 +1,26 @@
+{% load static %}<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Сервер базы данных недоступен — MedTracker</title>
+  <link rel="stylesheet" href="{% static 'analyses/style.css' %}">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar__inner">
+      <span class="brand">MedTracker</span>
+    </div>
+  </header>
+  <main class="container">
+    <section class="card card--narrow">
+      <h1>Сервер базы данных недоступен</h1>
+      <p>Не удалось подключиться к базе данных. Данные не изменены.</p>
+      <p class="muted">Попробуйте обновить страницу через несколько минут. Если ошибка повторяется, обратитесь к администратору.</p>
+      <div class="actions">
+        <a class="btn" href="">Обновить страницу</a>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

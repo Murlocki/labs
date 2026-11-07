@@ -1,0 +1,50 @@
+name: lab5
+services:
+  medtracker:
+    image: murlocki/medtracker:lab5
+    build: ./medtracker_app
+    ports:
+      - "8005:8000"
+    environment:
+      DEBUG: "True"
+      ALLOWED_HOSTS: "192.168.1.7,localhost,127.0.0.1"
+      DB_NAME: study
+      DB_USER: userdb
+      DB_HOST: host.docker.internal
+      DB_PORT: "5432"
+      DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
+      SECRET_KEY: ${SECRET_KEY:?Set SECRET_KEY in .env}
+      LOG_DIR: /app/logs
+      LOG_FILE: /app/logs/http.log
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - type: bind
+        source: ./logs
+        target: /app/logs
+      - type: volume
+        source: templates
+        target: /app/analyses/templates
+        read_only: true
+    networks:
+      student:
+        ipv4_address: 10.20.6.10
+    restart: unless-stopped
+
+volumes:
+  templates:
+    name: lab5_templates
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${TEMPLATES_HOST_PATH:-/home/murlock/labs/lab5/templates}
+
+networks:
+  student:
+    name: kornilov
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.20.6.0/24
+          gateway: 10.20.6.1

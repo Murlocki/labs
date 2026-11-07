@@ -1,0 +1,16 @@
+{% extends "analyses/base.html" %}
+{% block title %}Удаление анализа{% endblock %}
+{% block content %}
+<section class="card card--form">
+  <h1>Удалить анализ «{{ analysis.name }}»?</h1>
+  <p>Будут также удалены все значения этого анализа ({{ values_count }} шт.).</p>
+  <p class="warning">Действие необратимо.</p>
+  <form method="post">
+    {% csrf_token %}
+    <div class="actions">
+      <button type="submit" class="btn btn--danger">Удалить</button>
+      <a href="{% url 'analysis_detail' analysis.pk %}">Отмена</a>
+    </div>
+  </form>
+</section>
+{% endblock %}
