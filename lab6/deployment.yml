@@ -1,0 +1,113 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kornilov-app
+  namespace: kornilov-ns
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: kornilov-medtracker
+  template:
+    metadata:
+      labels:
+        app: kornilov-medtracker
+    spec:
+      initContainers:
+        - name: kornilov-init
+          image: murlocki/medtracker:lab5
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+            - |
+              set -e
+              mkdir -p /data/logs /data/templates
+              if [ ! -f /data/templates/registration/login.html ]; then
+                cp -a /app/analyses/templates/. /data/templates/
+              fi
+          volumeMounts:
+            - name: kornilov-data
+              mountPath: /data
+
+      containers:
+        - name: kornilov-medtracker
+          image: murlocki/medtracker:lab5
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - secretRef:
+                name: kornilov-secrets
+          env:
+            - name: DEBUG
+              value: "True"
+            - name: ALLOWED_HOSTS
+              value: "192.168.1.7,localhost,127.0.0.1"
+            - name: DB_HOST
+              value: "kornilov-db"
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_NAME
+              value: study
+            - name: DB_USER
+              value: userdb
+            - name: LOG_DIR
+              value: /app/logs
+            - name: LOG_FILE
+              value: /app/logs/http.log
+          volumeMounts:
+            - name: kornilov-data
+              mountPath: /app/logs
+              subPath: logs
+            - name: kornilov-data
+              mountPath: /app/analyses/templates
+              subPath: templates
+              readOnly: true
+          readinessProbe:
+            tcpSocket:
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+
+        - name: kornilov-nginx
+          image: nginx:stable-alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: kornilov-nginx-config
+              mountPath: /etc/nginx/conf.d
+              readOnly: true
+            - name: kornilov-data
+              mountPath: /var/log/nginx
+              subPath: logs
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "30m"
+            limits:
+              memory: "128Mi"
+              cpu: "100m"
+
+      volumes:
+        - name: kornilov-data
+          persistentVolumeClaim:
+            claimName: kornilov-pvc
+        - name: kornilov-nginx-config
+          configMap:
+            name: kornilov-nginx-config

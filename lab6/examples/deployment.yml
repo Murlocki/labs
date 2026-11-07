@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-dep
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-pod
+  template:
+    metadata:
+      labels:
+        app: nginx-pod
+    spec:
+      volumes:
+        - name: ngn
+          persistentVolumeClaim:
+            claimName: ngn-pv
+
+      containers:
+        - name: nginx-app
+          image: nginx:stable-alpine
+          volumeMounts:
+            - mountPath: /etc/nginx/conf.d
+              name: ngn
+              readOnly: true
+          resources:
+            requests:
+              memory: "50Mi"
+              cpu: "30m"
+            limits:
+              memory: "128Mi"
+              cpu: "100m"
+          ports:
+            - containerPort: 80
+              protocol: TCP
+
+        - name: nginx-goapp
+          image: docker.io/library/lab6-go-check:1.0
+          resources:
+            requests:
+              memory: "50Mi"
+              cpu: "30m"
+            limits:
+              memory: "128Mi"
+              cpu: "100m"
+          ports:
+            - containerPort: 8090
+              protocol: TCP
